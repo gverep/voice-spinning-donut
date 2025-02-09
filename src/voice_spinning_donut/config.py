@@ -1,6 +1,9 @@
+import os
+
 import numpy as np
 
 TITLE = "Spinning Donut with Voice Control"
+ICON_PATH = os.path.join("assets", "images", "donut.png")
 SCREEN_SIZE = 640
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
