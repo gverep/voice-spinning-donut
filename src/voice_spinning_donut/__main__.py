@@ -5,6 +5,7 @@ from queue import Queue
 import pygame
 
 from .config import (
+    ICON_PATH,
     INITIAL_ANGLE,
     INITIAL_ROTATION_SPEED,
     MAX_ROTATION_SPEED,
@@ -26,6 +27,8 @@ def select_microphone_index():
 
 def setup_screen():
     pygame.init()
+    icon = pygame.image.load(ICON_PATH)
+    pygame.display.set_icon(icon)
     screen = pygame.display.set_mode((SCREEN_SIZE, SCREEN_SIZE))
     pygame.display.set_caption(TITLE)
     logging.info("Screen initialized")
