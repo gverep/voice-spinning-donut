@@ -63,7 +63,7 @@ def handle_voice_command(queue: Queue, command: str) -> None:
     if "faster" in command:
         queue.put(("add", 1))
     elif "slower" in command:
-        queue.put(("substract", 1))
+        queue.put(("subtract", 1))
     elif "stop" in command:
         queue.put(("set", 0))
     elif "set" in command:
