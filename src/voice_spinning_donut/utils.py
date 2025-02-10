@@ -5,6 +5,7 @@ from queue import Queue
 import numpy as np
 import pygame
 import speech_recognition as sr
+from word2number import w2n
 
 from .config import BLACK, CIRCLE_POINTS, ILLUMINATION, K1, K2, PHI_SPACING, R1, R2, SCREEN_SIZE, THETA_SPACING, WHITE
 
@@ -67,10 +68,18 @@ def handle_voice_command(queue: Queue, command: str) -> None:
     elif "stop" in command:
         queue.put(("set", 0))
     elif "set" in command:
-        match = re.search(r"set (\d+)", command)
+        match = re.search(r"set (.+)", command, re.IGNORECASE)
         if match:
-            new_speed = int(match.group(1))
-            queue.put(("set", new_speed))
+            number_input = match.group(1).strip()
+            if number_input.isdigit():
+                new_speed = int(number_input)
+                queue.put(("set", new_speed))
+            else:
+                try:
+                    new_speed = w2n.word_to_num(number_input)
+                    queue.put(("set", new_speed))
+                except ValueError:
+                    logging.error("Invalid number input: %s", number_input)
 
 
 def process_audio(recognizer: sr.Recognizer, source: sr.Microphone, queue: Queue) -> None:
