@@ -1,3 +1,4 @@
 numpy==2.2.2
 pygame==2.5.0
 SpeechRecognition==3.11.0
+word2number==1.1
