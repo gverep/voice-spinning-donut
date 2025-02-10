@@ -42,7 +42,7 @@ def handle_voice_commands(voice_commands_queue: Queue, current_rotation_speed: i
 
         if command_type == "add":
             current_rotation_speed = min(MAX_ROTATION_SPEED, current_rotation_speed + 1)
-        elif command_type == "substract":
+        elif command_type == "subtract":
             current_rotation_speed = max(MIN_ROTATION_SPEED, current_rotation_speed - 1)
         elif command_type == "set":
             current_rotation_speed = max(MIN_ROTATION_SPEED, min(value, MAX_ROTATION_SPEED))
