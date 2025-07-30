@@ -42,4 +42,5 @@ python -m voice_spinning_donut
 - Say "set X" to set specific speed (where X is a number)
 
 ## License
+
 This project is licensed under the [MIT](LICENSE) License.
