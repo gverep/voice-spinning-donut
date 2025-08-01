@@ -8,6 +8,7 @@ A Python application that renders a 3D spinning donut which can be controlled us
 - Real-time voice command processing
 - Adjustable rotation speed
 - Multiple microphone support
+- Dynamic color themes
 
 ## Installation
 
@@ -40,6 +41,7 @@ python -m voice_spinning_donut
 - Say "slower" to decrease rotation speed
 - Say "stop" to halt rotation
 - Say "set X" to set specific speed (where X is a number)
+- Say "white, red, green, blue" to change donut color theme
 
 ## License
 
