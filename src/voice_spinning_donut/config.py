@@ -26,3 +26,12 @@ MAX_ROTATION_SPEED = 20
 MIN_ROTATION_SPEED = 0
 
 VOICE_UPDATE_INTERVAL = 1.0
+
+COLOR_THEMES = {
+    "white": [(255, 255, 255)] * len(ILLUMINATION),
+    "red": [(i * 15 % 255, 0, 0) for i in range(len(ILLUMINATION))],
+    "green": [(0, i * 15 % 255, 0) for i in range(len(ILLUMINATION))],
+    "blue": [(0, 0, i * 15 % 255) for i in range(len(ILLUMINATION))],
+}
+
+DEFAULT_THEME = "white"
