@@ -5,6 +5,8 @@ from queue import Queue
 import pygame
 
 from .config import (
+    COLOR_THEMES,
+    DEFAULT_THEME,
     ICON_PATH,
     INITIAL_ANGLE,
     INITIAL_ROTATION_SPEED,
@@ -35,7 +37,12 @@ def setup_screen():
     return screen
 
 
-def handle_voice_commands(voice_commands_queue: Queue, current_rotation_speed: int):
+def handle_voice_commands(
+    voice_commands_queue: Queue,
+    current_rotation_speed: int,
+    theme_colors: list,
+    current_theme: str,
+):
     while not voice_commands_queue.empty():
         command_type, value = voice_commands_queue.get()
         logging.info("Received voice command: %s, value: %s", command_type, value)
@@ -45,25 +52,41 @@ def handle_voice_commands(voice_commands_queue: Queue, current_rotation_speed: i
         elif command_type == "subtract":
             current_rotation_speed = max(MIN_ROTATION_SPEED, current_rotation_speed - 1)
         elif command_type == "set":
-            current_rotation_speed = max(MIN_ROTATION_SPEED, min(value, MAX_ROTATION_SPEED))
+            current_rotation_speed = max(
+                MIN_ROTATION_SPEED, min(value, MAX_ROTATION_SPEED)
+            )
+        elif command_type == "theme":
+            if value in COLOR_THEMES:
+                current_theme = value
+                theme_colors[:] = COLOR_THEMES[value]
+                logging.info(f"Theme changed to: {value}")
         else:
             logging.error("Unknown command type: %s", command_type)
 
         logging.info("Current rotation speed: %s", current_rotation_speed)
-    return current_rotation_speed
+        
+    return current_rotation_speed, current_theme
 
 
 def main():
     logging.basicConfig(
-        level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+        level=logging.DEBUG,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
+
+    current_theme = DEFAULT_THEME
+    theme_colors = COLOR_THEMES[current_theme]
 
     device_index = select_microphone_index()
     screen = setup_screen()
 
     voice_commands_queue = Queue()
     voice_thread = threading.Thread(
-        target=lambda: process_voice_commands(voice_commands_queue, device_index=device_index), daemon=True
+        target=lambda: process_voice_commands(
+            voice_commands_queue, device_index=device_index
+        ),
+        daemon=True,
     )
     voice_thread.start()
     logging.info("Voice commands processing started")
@@ -80,12 +103,17 @@ def main():
                 if event.type == pygame.QUIT:
                     running = False
 
-            current_rotation_speed = handle_voice_commands(voice_commands_queue, current_rotation_speed)
+            current_rotation_speed, current_theme = handle_voice_commands(
+                voice_commands_queue,
+                current_rotation_speed,
+                theme_colors,
+                current_theme,
+            )
             current_angle_a += THETA_SPACING * current_rotation_speed
             current_angle_b += PHI_SPACING * current_rotation_speed
 
             frame = render_frame(current_angle_a, current_angle_b)
-            draw_frame(screen, frame)
+            draw_frame(screen, frame, theme_colors)
             clock.tick(500)
     except Exception as e:
         logging.error("An error occurred: %s", e)

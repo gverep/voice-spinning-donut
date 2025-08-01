@@ -7,7 +7,7 @@ import pygame
 import speech_recognition as sr
 from word2number import w2n
 
-from .config import BLACK, CIRCLE_POINTS, ILLUMINATION, K1, K2, PHI_SPACING, R1, R2, SCREEN_SIZE, THETA_SPACING, WHITE
+from .config import BLACK, CIRCLE_POINTS, ILLUMINATION, K1, K2, PHI_SPACING, R1, R2, SCREEN_SIZE, THETA_SPACING, COLOR_THEMES
 
 
 def render_frame(angle_a: float, angle_b: float) -> np.ndarray:
@@ -46,7 +46,7 @@ def render_frame(angle_a: float, angle_b: float) -> np.ndarray:
     return output
 
 
-def draw_frame(screen: pygame.Surface, frame: np.ndarray) -> None:
+def draw_frame(screen: pygame.Surface, frame: np.ndarray, theme_colors: list[tuple[int, int, int]]) -> None:
     screen.fill(BLACK)
     font = pygame.font.Font(None, 18)
 
@@ -54,7 +54,12 @@ def draw_frame(screen: pygame.Surface, frame: np.ndarray) -> None:
         for x in range(SCREEN_SIZE):
             char = frame[y, x]
             if char != " ":
-                text = font.render(char, True, WHITE)
+                try:
+                    color_index = ILLUMINATION.tolist().index(char)
+                except ValueError:
+                    color_index = 0
+                color = tuple(map(int, theme_colors[color_index]))
+                text = font.render(char, True, color)
                 screen.blit(text, (x, y))
 
     pygame.display.flip()
@@ -72,14 +77,17 @@ def handle_voice_command(queue: Queue, command: str) -> None:
         if match:
             number_input = match.group(1).strip()
             if number_input.isdigit():
-                new_speed = int(number_input)
-                queue.put(("set", new_speed))
+                queue.put(("set", int(number_input)))
             else:
                 try:
                     new_speed = w2n.word_to_num(number_input)
                     queue.put(("set", new_speed))
                 except ValueError:
                     logging.error("Invalid number input: %s", number_input)
+    else:
+        for theme in COLOR_THEMES:
+            if theme in command:
+                queue.put(("theme", theme))
 
 
 def process_audio(recognizer: sr.Recognizer, source: sr.Microphone, queue: Queue) -> None:
